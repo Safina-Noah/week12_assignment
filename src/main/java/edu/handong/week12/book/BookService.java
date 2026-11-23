@@ -1,6 +1,10 @@
 package edu.handong.week12.book;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import edu.handong.week12.book.BookRequest;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 @Service
@@ -10,26 +14,35 @@ public class BookService {
   public BookService(BookRepository repository) {
     this.repository = repository;
   }
+  public BookResponse create(BookRequest request) {
+    Book saved = repository.save(new Book(request)); // INSERT
+    return BookResponse.from(saved);
+  }
 
-  public List<Book> findAll() {
-    return repository.findAll();
-  } // TODO STEP 6: Pagination/Sorting
+  public List<BookResponse> findAll() {
+    return repository.findAll().stream().map(BookResponse::from).toList();
+  }
 
-  public Book findById(Long id) {
-    return repository.findById(id).orElseThrow();
-  } // TODO STEP 5: 404
+  public BookResponse findById(Long id) {
+    return BookResponse.from(findEntity(id));
+  }
 
-  public Book create(Book book) {
-    return repository.save(book);
-  } // TODO STEP 3: DTO
-
-  public Book update(Long id, Book input) {
-    Book book = findById(id);
-    book.update(input.getTitle(), input.getAuthor(), input.getPrice());
-    return repository.save(book);
+  public BookResponse update(Long id, BookRequest request) {
+    Book book = findEntity(id);
+    book.update(request);
+    return BookResponse.from(repository.save(book));
   }
 
   public void delete(Long id) {
+    if (!repository.existsById(id)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found: " + id);
+    }
     repository.deleteById(id);
-  } // TODO: 404 if absent
+  }
+
+  private Book findEntity(Long id) {
+    return repository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Book not found: " + id));
+  }
 }

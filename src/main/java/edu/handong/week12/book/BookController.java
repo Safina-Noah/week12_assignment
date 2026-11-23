@@ -1,7 +1,12 @@
 package edu.handong.week12.book;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import edu.handong.week12.book.BookRequest;
+import edu.handong.week12.book.BookResponse;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -13,28 +18,26 @@ public class BookController {
         this.service = service;
     }
 
-    @GetMapping
-    public List<Book> list() {
-        return service.findAll();
-    } // TODO: Pageable
-
-    @GetMapping("/{id}")
-    public Book get(@PathVariable Long id) {
-        return service.findById(id);
+    @PostMapping
+    public ResponseEntity<BookResponse> create(@Valid @RequestBody BookRequest request) {
+        BookResponse created = service.create(request);
+        return ResponseEntity.created(URI.create("/api/books/" + created.id())).body(created);
     }
 
-    @PostMapping
-    public Book create(@RequestBody Book input) {
-        return service.create(input);
-    } // TODO: @Valid, ResponseEntity 201
+    @GetMapping
+    public List<BookResponse> findAll() { return service.findAll(); }
+
+    @GetMapping("/{id}")
+    public BookResponse findById(@PathVariable Long id) { return service.findById(id); }
 
     @PutMapping("/{id}")
-    public Book update(@PathVariable Long id, @RequestBody Book input) {
-        return service.update(id, input);
+    public BookResponse update(@PathVariable Long id, @Valid @RequestBody BookRequest request) {
+        return service.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
-    } // TODO: 204
+        return ResponseEntity.noContent().build();
+    }
 }

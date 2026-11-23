@@ -15,13 +15,18 @@ public class Book {
     @Column(nullable = false)
     private int price;
 
-    protected Book() {
+    protected Book() { } // JPA uses the no-args constructor.
+
+    public Book(BookRequest request) {
+        this.title = request.title();
+        this.author = request.author();
+        this.price = request.price();
     }
 
-    public Book(String title, String author, int price) {
-        this.title = title;
-        this.author = author;
-        this.price = price;
+    public void update(BookRequest request) {
+        this.title = request.title();
+        this.author = request.author();
+        this.price = request.price();
     }
 
     public Long getId() {
