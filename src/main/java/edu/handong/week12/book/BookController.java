@@ -23,8 +23,11 @@ public class BookController {
 
     @Operation(summary = "책 등록", description = "제목, 저자, 가격을 받아 새 책을 등록합니다.")
     @PostMapping
+    // POST 요청에 대해 BookRequest 객체로 service에 전달한다. 이때 객체 내에 정의된 validation 조건을 검사한다.
     public ResponseEntity<BookResponse> create(@Valid @RequestBody BookRequest request) {
+        //저장 이후 Service에서 반환된 BookResponse 객체를 받아온다.
         BookResponse created = service.create(request);
+        // 클라이언트에 ResponseEntity를 전달하여 성공 시 201 응답 코드를 전달한다.
         return ResponseEntity.created(URI.create("/api/books/" + created.id())).body(created);
     }
 

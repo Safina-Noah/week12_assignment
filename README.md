@@ -1,14 +1,29 @@
 ## 1. Project Information
-- 프로젝트 소개
+- 프로젝트 소개: Spring Boot와 Spring Data JPA를 사용한 책 관리 REST API 프로젝트이다. 책의 제목, 저자, 가격 정보를 관리할 수 있다.
 - GitHub URL
-  - 배포:
-  - 과제제출:
-- Render URL:
+  - 배포: https://github.com/Safina-Noah/week12_assignment.git
+  - 과제제출: https://github.com/2026-2-WebService/assign12-c01-22100063
+- Render URL: https://week12-assignment.onrender.com
 
 ---
 
 ## 2. Installation
-- Java/DB 환경과 실행 방법
+
+### 실행 환경
+
+- Java 17 JDK
+- Spring Boot 3.5.7, Spring Data JPA
+- DB: MariaDB
+
+### 기본 실행 (Windows PowerShell)
+
+프로젝트 폴더에서 다음 명령어를 실행한다.
+
+```powershell
+.\gradlew.bat bootRun
+```
+
+기본 포트는 8080이다.
 
 ---
 
@@ -77,45 +92,105 @@
 
    2. /v3/api-docs와 /swagger-ui.html의 역할을 구분해서 설명하세요.
    ```text
-    Answer: /v3/api-docs는 API 경로와 요청·응답 구조 등을 OpenAPI 명세의 JSON 형태로 제공한다.
+    Answer: /v3/api-docs는 API 경로와 요청, 응답 구조 등을 JSON 형태로 제공한다.
     /swagger-ui.html은 이 명세를 사람이 보기 쉬운 웹 화면으로 보여주며,
     API 요청을 직접 보내 보고 응답을 확인할 수 있게 한다.
    ```
-
-
-### 핵심 메서드 3개
-#### 개선된 Java 소스에 직접 줄 단위 설명 주석을 작성하세요.
-1. BookController.create() — @Valid, DTO, ResponseEntity, 201 응답
-2. BookService.findById() — Repository 조회, Optional, 404 예외 발생
-3. BookController.list() 또는 BookService.findAll() — Pageable, Page, DTO 변환
 ---
 
 ## 4. Refactoring
 - DTO와 ResponseEntity 변경 전/후
+
+### 변경 전
+
+책 등록 요청에 대해 200 OK와 책 데이터를 반환한다.
+
+![](results/01_sample.png)
+
+### 변경 후
+
+Request DTO로 입력을 받고 Response DTO로 생성 결과를 반환하며, ResponseEntity로 201 Created 상태 코드를 지정한다.
+
+![](results/02_dto_created.png)
 
 ---
 
 ## 5. New Features
 - Validation, 공통 예외 처리, Pagination/Sorting, Swagger
 
+### Validation
+
+음수 가격을 입력하면 검증에 실패하여 400 Bad Request와 code, message 필드가 있는 JSON 오류 응답을 반환한다.
+
+![](results/03_validation.png)
+
+### 공통 예외 처리
+
+존재하지 않는 책을 조회하면 404 Not Found와 공통 형식의 JSON 오류 응답을 반환한다.
+
+![](results/04_not_found.png)
+
+### Pagination / Sorting
+
+GET /api/books?page=0&size=5&sort=price,desc 요청으로 첫 페이지를 최대 5권씩 가격 내림차순으로 조회한다.
+
+![](results/05_pagination.png)
+
+### Swagger
+
+Swagger UI에서 책 단건 조회 API에 ID를 입력해 실행하고, 200 OK와 응답 본문을 확인한다.
+
+![](results/06_swagger.png)
+
 ---
 
 ## 6. Testing & Deployment
-- results/ 스크린샷 6장 이상 및 배포 URL
+
+01_sample.png
+
+![](results/01_sample.png)
+
+02_dto_created.png
+
+![](results/02_dto_created.png)
+
+03_validation.png
+
+![](results/03_validation.png)
+
+04_not_found.png
+
+![](results/04_not_found.png)
+
+05_pagination.png
+
+![](results/05_pagination.png)
+
+06_swagger.png
+
+![](results/06_swagger.png)
+
+- 배포 URL: [Render 서비스](https://week12-assignment.onrender.com)
+- 배포 Swagger UI: [API 문서 화면](https://week12-assignment.onrender.com/swagger-ui.html)
+- 배포 OpenAPI JSON: [API 명세](https://week12-assignment.onrender.com/v3/api-docs)
 
 ---
 ## 7. Weekly Review
 - 새롭게 배운 내용 3가지
    ```text
-     
+     1. Pagination: 단순 UI 측 페이지 구현이 아니라 실제 DB에서 데이터를 paging 단위로 요청할 수 있음을 배웠다.
+     2. RestControllerAdvice: 통일된 예외 처리를 할 수 있는 구조를 배웠다.
+     3. api-docs / Swagger-ui: API 요청 관련 구조를 확인하고 확인할 수 있게 하는 방식을 새롭게 배웠다.
    ```
 
 - 어려웠던 점과 해결 방법
    ```text
-     
+     RestControllerAdvice 구조 이해 및 구현이 어려웠다.
+     AI 활용하여 구조 이해한 후 프로젝트에 반영하였다.
    ```
 
 - AI 활용 내용 및 느낀 점
    ```text
-    
+    코드 구현에 활용하였고, 구현 도중 이해되지 않는 구조에 대해 질문하며 tutoring에 활용하였다.
+    과제 수행 과정에서 의도적인 병목을 만드는 습관의 중요성을 학습하였다. 
    ```

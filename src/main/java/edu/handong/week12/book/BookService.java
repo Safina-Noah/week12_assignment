@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
 
 @Service
 public class BookService {
@@ -19,13 +20,23 @@ public class BookService {
     return BookResponse.from(saved);
   }
 
+  // Pageable에는 요청 페이지 번호, 페이지 크기, 정렬 조건이 담긴다.
   public Page<BookResponse> findAll(Pageable pageable) {
-    // DB에서 해당 페이지를 조회하고 페이지 정보를 유지한 채 DTO로 변환한다.
-    return repository.findAll(pageable).map(BookResponse::from);
+    // Repository가 DB에서 해당 페이지를 조회한다.
+    Page<Book> books = repository.findAll(pageable);
+    // 각 Book을 응답 DTO로 변환한다.
+    return books.map(BookResponse::from);
   }
 
   public BookResponse findById(Long id) {
-    return BookResponse.from(findEntity(id));
+    // ID로 조회한다. 조회한 Book이 없을 수 있기에 Optional을 사용한다.
+    Optional<Book> optionalBook = repository.findById(id);
+    // 값이 있으면 Book을 꺼낸다. 없으면 404 상태 정보를 가진 예외를 발생시킨다.
+    // 이 예외는 GlobalExceptionHandler가 받아 공통 JSON 오류 응답으로 변환한다.
+    Book book = optionalBook.orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND, "Book not found: " + id));
+    // 조회된 엔티티를 클라이언트에게 반환할 응답 DTO로 변환한다.
+    return BookResponse.from(book);
   }
 
   public BookResponse update(Long id, BookRequest request) {
