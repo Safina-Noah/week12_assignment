@@ -1,11 +1,11 @@
 package edu.handong.week12.book;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import edu.handong.week12.book.BookRequest;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 
 @Service
 public class BookService {
@@ -19,8 +19,9 @@ public class BookService {
     return BookResponse.from(saved);
   }
 
-  public List<BookResponse> findAll() {
-    return repository.findAll().stream().map(BookResponse::from).toList();
+  public Page<BookResponse> findAll(Pageable pageable) {
+    // DB에서 해당 페이지를 조회하고 페이지 정보를 유지한 채 DTO로 변환한다.
+    return repository.findAll(pageable).map(BookResponse::from);
   }
 
   public BookResponse findById(Long id) {
